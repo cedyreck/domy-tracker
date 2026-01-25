@@ -125,54 +125,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pending_updates: {
-        Row: {
-          created_at: string
-          current_balance: number
-          id: string
-          opponent_id: string
-          proposed_balance: number
-          requester_id: string
-          resolved_at: string | null
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          current_balance?: number
-          id?: string
-          opponent_id: string
-          proposed_balance: number
-          requester_id: string
-          resolved_at?: string | null
-          status?: string
-        }
-        Update: {
-          created_at?: string
-          current_balance?: number
-          id?: string
-          opponent_id?: string
-          proposed_balance?: number
-          requester_id?: string
-          resolved_at?: string | null
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pending_updates_opponent_id_fkey"
-            columns: ["opponent_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pending_updates_requester_id_fkey"
-            columns: ["requester_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -223,10 +175,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      approve_pending_update: {
-        Args: { p_pending_id: string }
-        Returns: undefined
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -235,10 +183,6 @@ export type Database = {
         Returns: boolean
       }
       is_first_user: { Args: never; Returns: boolean }
-      reject_pending_update: {
-        Args: { p_pending_id: string }
-        Returns: undefined
-      }
       update_domy_balance: {
         Args: {
           p_new_balance: number

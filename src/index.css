@@ -50,10 +50,6 @@
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning (amber) */
-    --warning: 45 93% 47%;
-    --warning-foreground: 0 0% 0%;
-
     /* Sidebar tokens for light mode */
     --sidebar-background: 220 25% 94%;
     --sidebar-foreground: 220 40% 13%;
@@ -107,10 +103,6 @@
     /* Success/positive (green) */
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
-
-    /* Warning (amber) */
-    --warning: 45 93% 47%;
-    --warning-foreground: 0 0% 0%;
 
     /* Sidebar tokens for dark mode */
     --sidebar-background: 220 38% 10%;

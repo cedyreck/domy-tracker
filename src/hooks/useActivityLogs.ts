@@ -1,5 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface ActivityLog {
@@ -20,8 +19,6 @@ export interface ActivityLog {
 }
 
 export const useActivityLogs = (limit = 50) => {
-  const queryClient = useQueryClient();
-
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ["activity-logs", limit],
     queryFn: async () => {
@@ -52,29 +49,6 @@ export const useActivityLogs = (limit = 50) => {
       return data as ActivityLog[];
     },
   });
-
-  // Set up realtime subscription for activity_logs
-  useEffect(() => {
-    const channel = supabase
-      .channel("activity-logs-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "activity_logs",
-        },
-        () => {
-          // Refresh activity logs when new entries are added
-          queryClient.invalidateQueries({ queryKey: ["activity-logs"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient, limit]);
 
   return { logs, isLoading };
 };
