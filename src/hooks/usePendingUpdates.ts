@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -165,6 +166,35 @@ export const usePendingUpdates = () => {
       queryClient.invalidateQueries({ queryKey: ["pending-updates-outgoing"] });
     },
   });
+
+  // Set up realtime subscription for pending_updates
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel("pending-updates-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "pending_updates",
+        },
+        () => {
+          // Invalidate queries to refresh data
+          queryClient.invalidateQueries({ queryKey: ["pending-updates-incoming"] });
+          queryClient.invalidateQueries({ queryKey: ["pending-updates-outgoing"] });
+          queryClient.invalidateQueries({ queryKey: ["domy-relationships"] });
+          queryClient.invalidateQueries({ queryKey: ["rankings"] });
+          queryClient.invalidateQueries({ queryKey: ["activity-logs"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
 
   return {
     incomingRequests,
