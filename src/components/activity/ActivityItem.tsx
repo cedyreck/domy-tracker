@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GlassCard, GlassCardContent } from "@/components/ui/glass-card";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, User } from "lucide-react";
 
 interface ActivityItemProps {
   playerUsername: string;
@@ -12,6 +12,7 @@ interface ActivityItemProps {
   oldValue: number;
   newValue: number;
   createdAt: string;
+  isCurrentUser?: boolean;
 }
 
 export const ActivityItem = ({
@@ -22,6 +23,7 @@ export const ActivityItem = ({
   oldValue,
   newValue,
   createdAt,
+  isCurrentUser = false,
 }: ActivityItemProps) => {
   const getValueColor = (val: number) => {
     if (val > 0) return "text-success";
@@ -38,19 +40,42 @@ export const ActivityItem = ({
   const changeStr = change > 0 ? `+${change}` : change.toString();
 
   return (
-    <GlassCard className="animate-fade-in">
+    <GlassCard 
+      className={cn(
+        "animate-fade-in transition-all",
+        isCurrentUser && "ring-2 ring-primary/40 bg-primary/5"
+      )}
+    >
       <GlassCardContent className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           {/* Player Avatar */}
-          <Avatar className="h-9 w-9 border border-border">
-            <AvatarImage src={playerAvatar || ""} alt={playerUsername} />
-            <AvatarFallback className="text-sm bg-muted">
-              {playerUsername.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className={cn(
+              "h-9 w-9 border",
+              isCurrentUser ? "border-primary" : "border-border"
+            )}>
+              <AvatarImage src={playerAvatar || ""} alt={playerUsername} />
+              <AvatarFallback className={cn(
+                "text-sm",
+                isCurrentUser ? "bg-primary/20 text-primary" : "bg-muted"
+              )}>
+                {playerUsername.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {isCurrentUser && (
+              <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                <User className="h-2.5 w-2.5 text-primary-foreground" />
+              </div>
+            )}
+          </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <span className="font-medium">{playerUsername}</span>
+            <span className={cn(
+              "font-medium",
+              isCurrentUser && "text-primary"
+            )}>
+              {isCurrentUser ? "You" : playerUsername}
+            </span>
             <span className="text-muted-foreground text-sm">vs</span>
             <div className="flex items-center gap-1">
               <Avatar className="h-6 w-6 border border-border">

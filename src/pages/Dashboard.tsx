@@ -1,18 +1,64 @@
 import { useDomyRelationships } from "@/hooks/useDomyRelationships";
+import { usePendingUpdates } from "@/hooks/usePendingUpdates";
 import { DomyBalanceCard } from "@/components/dashboard/DomyBalanceCard";
-import { GlassCard, GlassCardContent } from "@/components/ui/glass-card";
-import { Loader2, Users } from "lucide-react";
+import { BalanceChart } from "@/components/dashboard/BalanceChart";
+import { PendingRequestCard } from "@/components/dashboard/PendingRequestCard";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
+import { Loader2, Users, Bell, Send } from "lucide-react";
 import { toast } from "sonner";
 
 const Dashboard = () => {
-  const { relationships, allPlayers, isLoading, updateBalance } = useDomyRelationships();
+  const { relationships, allPlayers, isLoading } = useDomyRelationships();
+  const {
+    incomingRequests,
+    outgoingRequests,
+    createRequest,
+    approveRequest,
+    rejectRequest,
+    cancelRequest,
+  } = usePendingUpdates();
 
-  const handleUpdateBalance = async (opponentId: string, newBalance: number) => {
+  const handleRequestUpdate = async (opponentId: string, newBalance: number, currentBalance: number) => {
     try {
-      await updateBalance.mutateAsync({ opponentId, newBalance });
-      toast.success("Balance updated!");
+      await createRequest.mutateAsync({
+        opponentId,
+        proposedBalance: newBalance,
+        currentBalance,
+      });
+      toast.success("Update request sent! Waiting for approval.");
+    } catch (error: any) {
+      if (error?.message?.includes("duplicate")) {
+        toast.error("You already have a pending request for this player");
+      } else {
+        toast.error("Failed to send update request");
+      }
+    }
+  };
+
+  const handleApprove = async (pendingId: string) => {
+    try {
+      await approveRequest.mutateAsync(pendingId);
+      toast.success("Update approved!");
     } catch {
-      toast.error("Failed to update balance");
+      toast.error("Failed to approve update");
+    }
+  };
+
+  const handleReject = async (pendingId: string) => {
+    try {
+      await rejectRequest.mutateAsync(pendingId);
+      toast.success("Update rejected");
+    } catch {
+      toast.error("Failed to reject update");
+    }
+  };
+
+  const handleCancel = async (pendingId: string) => {
+    try {
+      await cancelRequest.mutateAsync(pendingId);
+      toast.success("Request cancelled");
+    } catch {
+      toast.error("Failed to cancel request");
     }
   };
 
@@ -21,6 +67,10 @@ const Dashboard = () => {
   const playersWithoutRelationship = allPlayers.filter(
     (p) => !existingOpponentIds.has(p.id)
   );
+
+  // Check if there's a pending outgoing request for an opponent
+  const hasPendingRequest = (opponentId: string) =>
+    outgoingRequests.some((r) => r.opponent_id === opponentId);
 
   if (isLoading) {
     return (
@@ -34,41 +84,107 @@ const Dashboard = () => {
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-3xl font-bold gradient-text">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Your domy balance against other players</p>
+        <p className="text-muted-foreground mt-1">Track your domy balance and send update requests</p>
       </div>
 
-      {relationships.length === 0 && playersWithoutRelationship.length === 0 ? (
-        <GlassCard>
-          <GlassCardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No players yet</h3>
-            <p className="text-muted-foreground">Invite other players to start tracking!</p>
-          </GlassCardContent>
-        </GlassCard>
-      ) : (
-        <div className="grid gap-4">
-          {relationships.map((rel) => (
-            <DomyBalanceCard
-              key={rel.id}
-              opponentId={rel.opponent_id}
-              opponentUsername={rel.opponent?.username || "Unknown"}
-              opponentAvatar={rel.opponent?.avatar_url}
-              balance={rel.balance}
-              onUpdate={handleUpdateBalance}
-            />
-          ))}
-          {playersWithoutRelationship.map((player) => (
-            <DomyBalanceCard
-              key={player.id}
-              opponentId={player.id}
-              opponentUsername={player.username}
-              opponentAvatar={player.avatar_url}
-              balance={0}
-              onUpdate={handleUpdateBalance}
-            />
-          ))}
+      {/* Pending Requests Section */}
+      {(incomingRequests.length > 0 || outgoingRequests.length > 0) && (
+        <div className="space-y-4">
+          {incomingRequests.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-warning">
+                <Bell className="h-4 w-4" />
+                <span>Pending Approvals ({incomingRequests.length})</span>
+              </div>
+              <div className="grid gap-2">
+                {incomingRequests.map((request) => (
+                  <PendingRequestCard
+                    key={request.id}
+                    request={request}
+                    type="incoming"
+                    onApprove={() => handleApprove(request.id)}
+                    onReject={() => handleReject(request.id)}
+                    isLoading={approveRequest.isPending || rejectRequest.isPending}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {outgoingRequests.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Send className="h-4 w-4" />
+                <span>Sent Requests ({outgoingRequests.length})</span>
+              </div>
+              <div className="grid gap-2">
+                {outgoingRequests.map((request) => (
+                  <PendingRequestCard
+                    key={request.id}
+                    request={request}
+                    type="outgoing"
+                    onCancel={() => handleCancel(request.id)}
+                    isLoading={cancelRequest.isPending}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Split View: Chart (Left) | Player List (Right) */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Left Section: Chart */}
+        <div className="order-2 lg:order-1">
+          <BalanceChart />
+        </div>
+
+        {/* Right Section: Player List */}
+        <div className="order-1 lg:order-2 space-y-4">
+          <GlassCard>
+            <GlassCardHeader className="pb-2">
+              <GlassCardTitle className="flex items-center gap-2 text-lg">
+                <Users className="h-5 w-5 text-primary" />
+                Player Balances
+              </GlassCardTitle>
+            </GlassCardHeader>
+            <GlassCardContent className="space-y-3 max-h-[400px] overflow-y-auto">
+              {relationships.length === 0 && playersWithoutRelationship.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Users className="h-10 w-10 text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground">No players yet. Invite others to start tracking!</p>
+                </div>
+              ) : (
+                <>
+                  {relationships.map((rel) => (
+                    <DomyBalanceCard
+                      key={rel.id}
+                      opponentId={rel.opponent_id}
+                      opponentUsername={rel.opponent?.username || "Unknown"}
+                      opponentAvatar={rel.opponent?.avatar_url}
+                      balance={rel.balance}
+                      onUpdate={handleRequestUpdate}
+                      hasPendingRequest={hasPendingRequest(rel.opponent_id)}
+                    />
+                  ))}
+                  {playersWithoutRelationship.map((player) => (
+                    <DomyBalanceCard
+                      key={player.id}
+                      opponentId={player.id}
+                      opponentUsername={player.username}
+                      opponentAvatar={player.avatar_url}
+                      balance={0}
+                      onUpdate={handleRequestUpdate}
+                      hasPendingRequest={hasPendingRequest(player.id)}
+                    />
+                  ))}
+                </>
+              )}
+            </GlassCardContent>
+          </GlassCard>
+        </div>
+      </div>
     </div>
   );
 };
