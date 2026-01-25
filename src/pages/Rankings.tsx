@@ -1,6 +1,7 @@
 import { useRankings } from "@/hooks/useRankings";
 import { useAuth } from "@/contexts/AuthContext";
 import { RankingCard } from "@/components/rankings/RankingCard";
+import { TopThreePodium } from "@/components/rankings/TopThreePodium";
 import { Loader2, Trophy } from "lucide-react";
 
 const Rankings = () => {
@@ -15,6 +16,9 @@ const Rankings = () => {
     );
   }
 
+  // Players ranked 4th and beyond for the list
+  const remainingPlayers = rankings.slice(3);
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center gap-3">
@@ -25,18 +29,24 @@ const Rankings = () => {
         </div>
       </div>
 
-      <div className="grid gap-3">
-        {rankings.map((player) => (
-          <RankingCard
-            key={player.id}
-            rank={player.rank}
-            username={player.username}
-            avatarUrl={player.avatar_url}
-            totalBalance={player.total_balance}
-            isCurrentUser={player.id === user?.id}
-          />
-        ))}
-      </div>
+      {/* Top 3 Podium */}
+      <TopThreePodium players={rankings} currentUserId={user?.id} />
+
+      {/* Remaining Players List */}
+      {remainingPlayers.length > 0 && (
+        <div className="grid gap-3">
+          {remainingPlayers.map((player) => (
+            <RankingCard
+              key={player.id}
+              rank={player.rank}
+              username={player.username}
+              avatarUrl={player.avatar_url}
+              totalBalance={player.total_balance}
+              isCurrentUser={player.id === user?.id}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

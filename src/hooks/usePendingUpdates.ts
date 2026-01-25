@@ -196,6 +196,10 @@ export const usePendingUpdates = () => {
     };
   }, [user?.id, queryClient]);
 
+  // Helper to check if there's a pending outgoing request for an opponent
+  const hasPendingRequest = (opponentId: string) =>
+    outgoingRequests.some((r) => r.opponent_id === opponentId);
+
   return {
     incomingRequests,
     outgoingRequests,
@@ -204,5 +208,6 @@ export const usePendingUpdates = () => {
     approveRequest,
     rejectRequest,
     cancelRequest,
+    hasPendingRequest,
   };
 };

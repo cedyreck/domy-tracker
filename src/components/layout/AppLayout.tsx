@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
+import { Footer } from "@/components/layout/Footer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +47,7 @@ export const AppLayout = () => {
     user?.email?.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="glass-card sticky top-0 z-50 border-b border-x-0 border-t-0 rounded-none">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -211,9 +212,12 @@ export const AppLayout = () => {
       </header>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         <Outlet />
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
