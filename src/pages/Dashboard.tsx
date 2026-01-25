@@ -39,8 +39,9 @@ const Dashboard = () => {
     try {
       await approveRequest.mutateAsync(pendingId);
       toast.success("Update approved!");
-    } catch {
-      toast.error("Failed to approve update");
+    } catch (error: any) {
+      console.error("Approve error:", error);
+      toast.error(error?.message || "Failed to approve update");
     }
   };
 
@@ -48,8 +49,9 @@ const Dashboard = () => {
     try {
       await rejectRequest.mutateAsync(pendingId);
       toast.success("Update rejected");
-    } catch {
-      toast.error("Failed to reject update");
+    } catch (error: any) {
+      console.error("Reject error:", error);
+      toast.error(error?.message || "Failed to reject update");
     }
   };
 
