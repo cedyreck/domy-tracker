@@ -19,6 +19,12 @@ const Dashboard = () => {
   } = usePendingUpdates();
 
   const handleRequestUpdate = async (opponentId: string, newBalance: number, currentBalance: number) => {
+    // Check if there's already a pending request for this opponent
+    if (hasPendingRequest(opponentId)) {
+      toast.error("You already have a pending request for this player");
+      return;
+    }
+    
     try {
       await createRequest.mutateAsync({
         opponentId,
@@ -27,9 +33,11 @@ const Dashboard = () => {
       });
       toast.success("Update request sent! Waiting for approval.");
     } catch (error: any) {
-      if (error?.message?.includes("duplicate")) {
+      const errorMessage = error?.message || error?.toString() || "";
+      if (errorMessage.includes("duplicate") || errorMessage.includes("unique constraint")) {
         toast.error("You already have a pending request for this player");
       } else {
+        console.error("Create request error:", error);
         toast.error("Failed to send update request");
       }
     }
