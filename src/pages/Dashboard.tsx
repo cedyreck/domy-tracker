@@ -3,6 +3,7 @@ import { usePendingUpdates } from "@/hooks/usePendingUpdates";
 import { DomyBalanceCard } from "@/components/dashboard/DomyBalanceCard";
 import { BalanceChart } from "@/components/dashboard/BalanceChart";
 import { PendingRequestCard } from "@/components/dashboard/PendingRequestCard";
+import { StatsCards } from "@/components/dashboard/StatsCards";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Loader2, Users, Bell, Send } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +17,13 @@ const Dashboard = () => {
     approveRequest,
     rejectRequest,
     cancelRequest,
+    hasPendingRequest,
   } = usePendingUpdates();
+
+  // Calculate total score
+  const totalScore = relationships.reduce((sum, rel) => sum + rel.balance, 0);
+  const opponentCount = relationships.length + allPlayers.filter(p => !relationships.some(r => r.opponent_id === p.id)).length;
+  const pendingCount = incomingRequests.length + outgoingRequests.length;
 
   const handleRequestUpdate = async (opponentId: string, newBalance: number, currentBalance: number) => {
     // Check if there's already a pending request for this opponent
@@ -78,10 +85,6 @@ const Dashboard = () => {
     (p) => !existingOpponentIds.has(p.id)
   );
 
-  // Check if there's a pending outgoing request for an opponent
-  const hasPendingRequest = (opponentId: string) =>
-    outgoingRequests.some((r) => r.opponent_id === opponentId);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -96,6 +99,13 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold gradient-text">Dashboard</h1>
         <p className="text-muted-foreground mt-1">Track your domy balance and send update requests</p>
       </div>
+
+      {/* Stats Cards */}
+      <StatsCards 
+        totalScore={totalScore} 
+        opponentCount={opponentCount} 
+        pendingCount={pendingCount} 
+      />
 
       {/* Pending Requests Section */}
       {(incomingRequests.length > 0 || outgoingRequests.length > 0) && (
