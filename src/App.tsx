@@ -12,6 +12,7 @@ import Rankings from "./pages/Rankings";
 import Activity from "./pages/Activity";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/activity" element={<Activity />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
               <Route
                 path="/admin"
                 element={
