@@ -32,19 +32,24 @@ const Rankings = () => {
       {/* Top 3 Podium */}
       <TopThreePodium players={rankings} currentUserId={user?.id} />
 
-      {/* Remaining Players List */}
+      {/* Full Ranking List */}
       {remainingPlayers.length > 0 && (
-        <div className="grid gap-3">
-          {remainingPlayers.map((player) => (
-            <RankingCard
-              key={player.id}
-              rank={player.rank}
-              username={player.username}
-              avatarUrl={player.avatar_url}
-              totalBalance={player.total_balance}
-              isCurrentUser={player.id === user?.id}
-            />
-          ))}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Full Ranking</h2>
+          <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm p-4">
+            <div className="grid gap-3">
+              {remainingPlayers.map((player) => (
+                <RankingCard
+                  key={player.id}
+                  rank={player.rank}
+                  username={player.username}
+                  avatarUrl={player.avatar_url}
+                  totalBalance={player.total_balance}
+                  isCurrentUser={player.id === user?.id}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
