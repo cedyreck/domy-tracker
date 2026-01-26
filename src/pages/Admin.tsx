@@ -2,8 +2,9 @@ import { useInviteTokens } from "@/hooks/useInviteTokens";
 import { GenerateTokenForm } from "@/components/admin/GenerateTokenForm";
 import { InviteTokenCard } from "@/components/admin/InviteTokenCard";
 import { TerminateSessionButton } from "@/components/admin/TerminateSessionButton";
+import { AdminResetPasswordDialog } from "@/components/admin/AdminResetPasswordDialog";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
-import { Loader2, Shield, Key, Gamepad2 } from "lucide-react";
+import { Loader2, Shield, Key, Gamepad2, Users } from "lucide-react";
 import { toast } from "sonner";
 
 const Admin = () => {
@@ -70,7 +71,25 @@ const Admin = () => {
         </GlassCardContent>
       </GlassCard>
 
-      {/* Invite Tokens Section */}
+      {/* User Management */}
+      <GlassCard>
+        <GlassCardHeader>
+          <GlassCardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            User Management
+          </GlassCardTitle>
+        </GlassCardHeader>
+        <GlassCardContent>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Reset a user's password if they've lost access to their email.
+              </p>
+            </div>
+            <AdminResetPasswordDialog />
+          </div>
+        </GlassCardContent>
+      </GlassCard>
       <div className="grid gap-8 lg:grid-cols-[350px,1fr]">
         <GenerateTokenForm onGenerate={handleGenerate} />
 

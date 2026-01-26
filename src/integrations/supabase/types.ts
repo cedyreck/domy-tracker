@@ -292,6 +292,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_reset_password: {
+        Args: { new_password: string; target_user_id: string }
+        Returns: boolean
+      }
       approve_pending_update: {
         Args: { p_pending_id: string }
         Returns: undefined

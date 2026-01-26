@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,14 +24,24 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Gamepad2, Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 
 const Auth = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstUser, setIsFirstUser] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState("signin");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  // Check if user is coming from password reset link
+  useEffect(() => {
+    if (searchParams.get("reset") === "true") {
+      toast.info("You can now set a new password in Settings after signing in.");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (user) {
@@ -140,53 +150,66 @@ const Auth = () => {
             </TabsList>
 
             <TabsContent value="signin" className="mt-6">
-              <form
-                onSubmit={signInForm.handleSubmit(handleSignIn)}
-                className="space-y-4"
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    {...signInForm.register("email")}
-                    className="bg-background/50"
-                  />
-                  {signInForm.formState.errors.email && (
-                    <p className="text-sm text-destructive">
-                      {signInForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="••••••••"
-                    {...signInForm.register("password")}
-                    className="bg-background/50"
-                  />
-                  {signInForm.formState.errors.password && (
-                    <p className="text-sm text-destructive">
-                      {signInForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
+              {showForgotPassword ? (
+                <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
+              ) : (
+                <form
+                  onSubmit={signInForm.handleSubmit(handleSignIn)}
+                  className="space-y-4"
                 >
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
-                  Sign In
-                </Button>
-              </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      {...signInForm.register("email")}
+                      className="bg-background/50"
+                    />
+                    {signInForm.formState.errors.email && (
+                      <p className="text-sm text-destructive">
+                        {signInForm.formState.errors.email.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="signin-password">Password</Label>
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                    <Input
+                      id="signin-password"
+                      type="password"
+                      placeholder="••••••••"
+                      {...signInForm.register("password")}
+                      className="bg-background/50"
+                    />
+                    {signInForm.formState.errors.password && (
+                      <p className="text-sm text-destructive">
+                        {signInForm.formState.errors.password.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    Sign In
+                  </Button>
+                </form>
+              )}
             </TabsContent>
 
             <TabsContent value="signup" className="mt-6">
