@@ -26,14 +26,16 @@ serve(async (req: Request) => {
       );
     }
 
-    // Create client with user's token to verify they're an admin
-    const supabaseUser = createClient(
+    // Use service role client to verify the JWT and get user info
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    const { data: userData, error: userError } = await supabaseUser.auth.getUser();
+    // Extract token and get user using admin client
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !userData?.user) {
       console.error("User error:", userError);
@@ -45,8 +47,8 @@ serve(async (req: Request) => {
 
     const userId = userData.user.id;
 
-    // Check if user is admin
-    const { data: roleData, error: roleError } = await supabaseUser
+    // Check if user is admin using the admin client
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
@@ -77,13 +79,7 @@ serve(async (req: Request) => {
       );
     }
 
-    // Use service role to reset password
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
-
+    // Use the already created admin client to reset password
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       targetUserId,
       { password: newPassword }
