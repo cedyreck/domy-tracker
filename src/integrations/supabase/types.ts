@@ -95,6 +95,33 @@ export type Database = {
           },
         ]
       }
+      game_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          ended_by: string | null
+          id: string
+          is_active: boolean
+          started_at: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          ended_by?: string | null
+          id?: string
+          is_active?: boolean
+          started_at?: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          ended_by?: string | null
+          id?: string
+          is_active?: boolean
+          started_at?: string
+        }
+        Relationships: []
+      }
       invite_tokens: {
         Row: {
           created_at: string
@@ -197,6 +224,48 @@ export type Database = {
         }
         Relationships: []
       }
+      session_scores: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: string
+          rank: number
+          session_id: string
+          total_balance: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: string
+          rank: number
+          session_id: string
+          total_balance?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: string
+          rank?: number
+          session_id?: string
+          total_balance?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_scores_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_scores_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -239,6 +308,7 @@ export type Database = {
         Args: { p_pending_id: string }
         Returns: undefined
       }
+      terminate_game_session: { Args: never; Returns: string }
       update_domy_balance: {
         Args: {
           p_new_balance: number
