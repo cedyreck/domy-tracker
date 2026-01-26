@@ -36,7 +36,7 @@ export const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
     setIsLoading(true);
     
     const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}/auth?reset=true`,
+      redirectTo: `${window.location.origin}/auth`,
     });
 
     setIsLoading(false);
@@ -97,7 +97,6 @@ export const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
             type="email"
             placeholder="you@example.com"
             {...form.register("email")}
-            className="bg-background/50"
           />
           {form.formState.errors.email && (
             <p className="text-sm text-destructive">
