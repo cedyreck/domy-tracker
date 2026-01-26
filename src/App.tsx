@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Rankings from "./pages/Rankings";
 import Activity from "./pages/Activity";
+import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/activity" element={<Activity />} />
+              <Route path="/reports" element={<Reports />} />
               <Route
                 path="/admin"
                 element={

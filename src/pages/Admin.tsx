@@ -1,7 +1,9 @@
 import { useInviteTokens } from "@/hooks/useInviteTokens";
 import { GenerateTokenForm } from "@/components/admin/GenerateTokenForm";
 import { InviteTokenCard } from "@/components/admin/InviteTokenCard";
-import { Loader2, Shield, Key } from "lucide-react";
+import { TerminateSessionButton } from "@/components/admin/TerminateSessionButton";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
+import { Loader2, Shield, Key, Gamepad2 } from "lucide-react";
 import { toast } from "sonner";
 
 const Admin = () => {
@@ -45,6 +47,30 @@ const Admin = () => {
         </div>
       </div>
 
+      {/* Game Session Management */}
+      <GlassCard>
+        <GlassCardHeader>
+          <GlassCardTitle className="flex items-center gap-2">
+            <Gamepad2 className="h-5 w-5 text-primary" />
+            Game Session Management
+          </GlassCardTitle>
+        </GlassCardHeader>
+        <GlassCardContent>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                End the current game session to archive all scores and reset balances to zero.
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Archived scores will be viewable in the Reports page.
+              </p>
+            </div>
+            <TerminateSessionButton />
+          </div>
+        </GlassCardContent>
+      </GlassCard>
+
+      {/* Invite Tokens Section */}
       <div className="grid gap-8 lg:grid-cols-[350px,1fr]">
         <GenerateTokenForm onGenerate={handleGenerate} />
 

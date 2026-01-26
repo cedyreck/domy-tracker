@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Trophy,
   Activity,
+  FileText,
   Shield,
   Sun,
   Moon,
@@ -30,6 +31,7 @@ const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/rankings", icon: Trophy, label: "Rankings" },
   { to: "/activity", icon: Activity, label: "Activity" },
+  { to: "/reports", icon: FileText, label: "Reports" },
 ];
 
 export const AppLayout = () => {
