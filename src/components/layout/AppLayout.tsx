@@ -1,7 +1,9 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
+import { usePendingUpdates } from "@/hooks/usePendingUpdates";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Footer } from "@/components/layout/Footer";
 import {
   DropdownMenu,
@@ -38,8 +40,11 @@ const navItems = [
 export const AppLayout = () => {
   const { user, isAdmin, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { incomingRequests } = usePendingUpdates();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const incomingCount = incomingRequests.length;
 
   const handleSignOut = async () => {
     await signOut();
@@ -72,7 +77,7 @@ export const AppLayout = () => {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors relative",
                     isActive
                       ? "bg-primary/20 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -81,6 +86,14 @@ export const AppLayout = () => {
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
+                {item.to === "/dashboard" && incomingCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="ml-1 h-5 min-w-5 px-1.5 text-xs flex items-center justify-center animate-pulse"
+                  >
+                    {incomingCount}
+                  </Badge>
+                )}
               </NavLink>
             ))}
             {isAdmin && (
@@ -195,6 +208,14 @@ export const AppLayout = () => {
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
+                  {item.to === "/dashboard" && incomingCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="ml-auto h-5 min-w-5 px-1.5 text-xs flex items-center justify-center animate-pulse"
+                    >
+                      {incomingCount}
+                    </Badge>
+                  )}
                 </NavLink>
               ))}
               {isAdmin && (
