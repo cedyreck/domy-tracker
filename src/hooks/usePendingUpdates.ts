@@ -132,9 +132,11 @@ export const usePendingUpdates = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pending-updates-incoming"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-updates-outgoing"] });
       queryClient.invalidateQueries({ queryKey: ["domy-relationships"] });
       queryClient.invalidateQueries({ queryKey: ["rankings"] });
       queryClient.invalidateQueries({ queryKey: ["activity-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["request-history"] });
     },
   });
 
@@ -148,7 +150,10 @@ export const usePendingUpdates = () => {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Immediately invalidate both incoming and outgoing to ensure UI updates
       queryClient.invalidateQueries({ queryKey: ["pending-updates-incoming"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-updates-outgoing"] });
+      queryClient.invalidateQueries({ queryKey: ["request-history"] });
     },
   });
 

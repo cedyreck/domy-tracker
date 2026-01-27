@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/glass-card";
 import { Pencil, Clock } from "lucide-react";
 import { UpdateDomyDialog } from "./UpdateDomyDialog";
+import { RequestHistoryHoverCard } from "./RequestHistoryHoverCard";
 
 interface DomyBalanceCardProps {
   opponentId: string;
@@ -55,31 +56,37 @@ export const DomyBalanceCard = ({
         )}
       >
         <GlassCardContent className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Avatar className="h-12 w-12 border-2 border-border">
-                <AvatarImage src={opponentAvatar || ""} alt={opponentUsername} />
-                <AvatarFallback className="bg-muted text-lg">
-                  {opponentUsername.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {hasPendingRequest && (
-                <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-warning flex items-center justify-center">
-                  <Clock className="h-3 w-3 text-warning-foreground" />
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">{opponentUsername}</p>
-              <p className="text-sm text-muted-foreground">
-                {hasPendingRequest ? (
-                  <span className="text-warning">Pending approval</span>
-                ) : (
-                  "vs you"
+          <RequestHistoryHoverCard
+            opponentId={opponentId}
+            opponentUsername={opponentUsername}
+            opponentAvatar={opponentAvatar}
+          >
+            <div className="flex items-center gap-3 cursor-pointer">
+              <div className="relative">
+                <Avatar className="h-12 w-12 border-2 border-border">
+                  <AvatarImage src={opponentAvatar || ""} alt={opponentUsername} />
+                  <AvatarFallback className="bg-muted text-lg">
+                    {opponentUsername.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {hasPendingRequest && (
+                  <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-warning flex items-center justify-center">
+                    <Clock className="h-3 w-3 text-warning-foreground" />
+                  </div>
                 )}
-              </p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">{opponentUsername}</p>
+                <p className="text-sm text-muted-foreground">
+                  {hasPendingRequest ? (
+                    <span className="text-warning">Pending approval</span>
+                  ) : (
+                    "vs you"
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
+          </RequestHistoryHoverCard>
 
           <div className="flex items-center gap-3">
             <div
