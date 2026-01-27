@@ -196,9 +196,11 @@ export const usePendingUpdates = () => {
     };
   }, [user?.id, queryClient]);
 
-  // Helper to check if there's a pending outgoing request for an opponent
+  // Helper to check if there's a pending request in EITHER direction for an opponent
+  // This prevents both users from creating duplicate requests
   const hasPendingRequest = (opponentId: string) =>
-    outgoingRequests.some((r) => r.opponent_id === opponentId);
+    outgoingRequests.some((r) => r.opponent_id === opponentId) ||
+    incomingRequests.some((r) => r.requester_id === opponentId);
 
   return {
     incomingRequests,
