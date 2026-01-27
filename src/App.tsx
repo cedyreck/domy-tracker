@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Rankings from "./pages/Rankings";
 import Activity from "./pages/Activity";
 import Reports from "./pages/Reports";
+import GameSuggestions from "./pages/GameSuggestions";
 import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/activity" element={<Activity />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/suggestions" element={<GameSuggestions />} />
               <Route path="/settings" element={<Settings />} />
               <Route
                 path="/admin"

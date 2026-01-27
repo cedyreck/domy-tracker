@@ -19,6 +19,7 @@ import {
   Trophy,
   Activity,
   FileText,
+  Sparkles,
   Shield,
   Sun,
   Moon,
@@ -35,6 +36,7 @@ const navItems = [
   { to: "/rankings", icon: Trophy, label: "Rankings" },
   { to: "/activity", icon: Activity, label: "Activity" },
   { to: "/reports", icon: FileText, label: "Reports" },
+  { to: "/suggestions", icon: Sparkles, label: "Suggestions" },
 ];
 
 export const AppLayout = () => {
