@@ -224,6 +224,54 @@ export type Database = {
         }
         Relationships: []
       }
+      request_history: {
+        Row: {
+          created_at: string
+          current_balance: number
+          id: string
+          opponent_id: string
+          proposed_balance: number
+          requester_id: string
+          resolved_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          current_balance?: number
+          id?: string
+          opponent_id: string
+          proposed_balance: number
+          requester_id: string
+          resolved_at?: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          current_balance?: number
+          id?: string
+          opponent_id?: string
+          proposed_balance?: number
+          requester_id?: string
+          resolved_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_history_opponent_id_fkey"
+            columns: ["opponent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_history_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_scores: {
         Row: {
           created_at: string
