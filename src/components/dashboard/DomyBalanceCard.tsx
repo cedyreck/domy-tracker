@@ -51,7 +51,7 @@ export const DomyBalanceCard = ({
       <GlassCard
         variant="elevated"
         className={cn(
-          "group relative overflow-hidden",
+          "group relative",
           hasPendingRequest && "border-warning/30"
         )}
       >
