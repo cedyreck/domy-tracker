@@ -18,6 +18,9 @@ export interface SessionScore {
   total_balance: number;
   rank: number;
   created_at: string;
+  paid: boolean;
+  paid_at: string | null;
+  paid_by: string | null;
   player?: {
     username: string;
     avatar_url: string | null;
@@ -76,6 +79,9 @@ export const useGameSessions = () => {
             total_balance,
             rank,
             created_at,
+            paid,
+            paid_at,
+            paid_by,
             player:profiles!session_scores_player_id_fkey (
               username,
               avatar_url
@@ -107,12 +113,52 @@ export const useGameSessions = () => {
     },
   });
 
+  // Mark score as paid (admin only)
+  const markAsPaid = useMutation({
+    mutationFn: async (scoreId: string) => {
+      const { error } = await supabase
+        .from("session_scores")
+        .update({
+          paid: true,
+          paid_at: new Date().toISOString(),
+          paid_by: (await supabase.auth.getUser()).data.user?.id,
+        })
+        .eq("id", scoreId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["session-scores"] });
+    },
+  });
+
+  // Mark score as unpaid (admin only)
+  const markAsUnpaid = useMutation({
+    mutationFn: async (scoreId: string) => {
+      const { error } = await supabase
+        .from("session_scores")
+        .update({
+          paid: false,
+          paid_at: null,
+          paid_by: null,
+        })
+        .eq("id", scoreId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["session-scores"] });
+    },
+  });
+
   return {
     sessions,
     activeSession,
     loadingSessions,
     useSessionScores,
     terminateSession,
+    markAsPaid,
+    markAsUnpaid,
     canTerminate: isAdmin,
   };
 };

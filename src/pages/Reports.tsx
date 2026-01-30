@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { useGameSessions, GameSession } from "@/hooks/useGameSessions";
+import { useGameSessions } from "@/hooks/useGameSessions";
+import { useAuth } from "@/contexts/AuthContext";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, FileText, Trophy, Medal, Award, Calendar } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Loader2, FileText, Trophy, Medal, Award, Calendar, Check, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const getRankIcon = (rank: number) => {
   switch (rank) {
@@ -33,8 +37,14 @@ const getRankStyle = (rank: number) => {
   }
 };
 
+const formatAmount = (balance: number) => {
+  const amount = balance * 500;
+  return `${amount.toLocaleString()} Ar`;
+};
+
 const Reports = () => {
-  const { sessions, loadingSessions, useSessionScores } = useGameSessions();
+  const { sessions, loadingSessions, useSessionScores, markAsPaid, markAsUnpaid } = useGameSessions();
+  const { isAdmin } = useAuth();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   
   const { data: scores = [], isLoading: loadingScores } = useSessionScores(selectedSessionId);
@@ -50,6 +60,20 @@ const Reports = () => {
   const formatBalance = (balance: number) => {
     if (balance > 0) return `+${balance}`;
     return balance.toString();
+  };
+
+  const handleTogglePaid = async (scoreId: string, currentlyPaid: boolean) => {
+    try {
+      if (currentlyPaid) {
+        await markAsUnpaid.mutateAsync(scoreId);
+        toast.success("Marked as unpaid");
+      } else {
+        await markAsPaid.mutateAsync(scoreId);
+        toast.success("Marked as paid");
+      }
+    } catch {
+      toast.error("Failed to update payment status");
+    }
   };
 
   if (loadingSessions) {
@@ -134,13 +158,13 @@ const Reports = () => {
                   <div
                     key={score.id}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border",
+                      "flex items-center justify-between p-3 rounded-lg border gap-2",
                       getRankStyle(score.rank)
                     )}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Rank */}
-                      <div className="flex h-8 w-8 items-center justify-center">
+                      <div className="flex h-8 w-8 items-center justify-center shrink-0">
                         {getRankIcon(score.rank) || (
                           <span className="text-sm font-bold text-muted-foreground">
                             #{score.rank}
@@ -149,19 +173,53 @@ const Reports = () => {
                       </div>
 
                       {/* Avatar & Name */}
-                      <Avatar className="h-8 w-8 border border-border">
+                      <Avatar className="h-8 w-8 border border-border shrink-0">
                         <AvatarImage src={score.player?.avatar_url || ""} />
                         <AvatarFallback className="bg-muted text-xs">
                           {score.player?.username?.charAt(0).toUpperCase() || "?"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{score.player?.username || "Unknown"}</span>
+                      <span className="font-medium truncate">{score.player?.username || "Unknown"}</span>
                     </div>
 
-                    {/* Score */}
-                    <span className={cn("text-lg font-bold", getBalanceColor(score.total_balance))}>
-                      {formatBalance(score.total_balance)}
-                    </span>
+                    {/* Score & Amount */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <span className={cn("text-lg font-bold block", getBalanceColor(score.total_balance))}>
+                          {formatBalance(score.total_balance)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {formatAmount(score.total_balance)}
+                        </span>
+                      </div>
+
+                      {/* Paid Status */}
+                      <div className="flex items-center gap-2">
+                        {score.paid ? (
+                          <Badge variant="default" className="bg-success text-success-foreground gap-1">
+                            <Check className="h-3 w-3" />
+                            Paid
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="gap-1">
+                            <X className="h-3 w-3" />
+                            Unpaid
+                          </Badge>
+                        )}
+                        
+                        {isAdmin && (
+                          <Button
+                            size="sm"
+                            variant={score.paid ? "outline" : "default"}
+                            onClick={() => handleTogglePaid(score.id, score.paid)}
+                            disabled={markAsPaid.isPending || markAsUnpaid.isPending}
+                            className="h-7 text-xs"
+                          >
+                            {score.paid ? "Mark Unpaid" : "Mark Paid"}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

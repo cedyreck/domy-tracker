@@ -3,8 +3,9 @@ import { GenerateTokenForm } from "@/components/admin/GenerateTokenForm";
 import { InviteTokenCard } from "@/components/admin/InviteTokenCard";
 import { TerminateSessionButton } from "@/components/admin/TerminateSessionButton";
 import { AdminResetPasswordDialog } from "@/components/admin/AdminResetPasswordDialog";
+import { UserRoleManagement } from "@/components/admin/UserRoleManagement";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
-import { Loader2, Shield, Key, Gamepad2, Users } from "lucide-react";
+import { Loader2, Shield, Key, Gamepad2, Users, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 const Admin = () => {
@@ -88,6 +89,19 @@ const Admin = () => {
             </div>
             <AdminResetPasswordDialog />
           </div>
+        </GlassCardContent>
+      </GlassCard>
+
+      {/* Role Management */}
+      <GlassCard>
+        <GlassCardHeader>
+          <GlassCardTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            Role Management
+          </GlassCardTitle>
+        </GlassCardHeader>
+        <GlassCardContent>
+          <UserRoleManagement />
         </GlassCardContent>
       </GlassCard>
       <div className="grid gap-8 lg:grid-cols-[350px,1fr]">

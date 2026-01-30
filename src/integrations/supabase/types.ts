@@ -276,6 +276,9 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          paid: boolean
+          paid_at: string | null
+          paid_by: string | null
           player_id: string
           rank: number
           session_id: string
@@ -284,6 +287,9 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          paid?: boolean
+          paid_at?: string | null
+          paid_by?: string | null
           player_id: string
           rank: number
           session_id: string
@@ -292,6 +298,9 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          paid?: boolean
+          paid_at?: string | null
+          paid_by?: string | null
           player_id?: string
           rank?: number
           session_id?: string
