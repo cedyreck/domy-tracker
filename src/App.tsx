@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { Analytics } from "@vercel/analytics/react";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Rankings from "./pages/Rankings";
@@ -54,6 +55,7 @@ const App = () => (
           </Routes>
         </AuthProvider>
       </BrowserRouter>
+      <Analytics />
     </TooltipProvider>
   </QueryClientProvider>
 );
