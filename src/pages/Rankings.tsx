@@ -1,0 +1,59 @@
+import { useRankings } from "@/hooks/useRankings";
+import { useAuth } from "@/contexts/AuthContext";
+import { RankingCard } from "@/components/rankings/RankingCard";
+import { TopThreePodium } from "@/components/rankings/TopThreePodium";
+import { Loader2, Trophy } from "lucide-react";
+
+const Rankings = () => {
+  const { rankings, isLoading } = useRankings();
+  const { user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Players ranked 4th and beyond for the list
+  const remainingPlayers = rankings.slice(3);
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center gap-3">
+        <Trophy className="h-8 w-8 text-primary" />
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">Rankings</h1>
+          <p className="text-muted-foreground">Global leaderboard by total earnings</p>
+        </div>
+      </div>
+
+      {/* Top 3 Podium */}
+      <TopThreePodium players={rankings} currentUserId={user?.id} />
+
+      {/* Full Ranking List */}
+      {remainingPlayers.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Full Ranking</h2>
+          <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm p-4">
+            <div className="grid gap-3">
+              {remainingPlayers.map((player) => (
+                <RankingCard
+                  key={player.id}
+                  rank={player.rank}
+                  username={player.username}
+                  avatarUrl={player.avatar_url}
+                  totalBalance={player.total_balance}
+                  isCurrentUser={player.id === user?.id}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Rankings;

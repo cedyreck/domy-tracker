@@ -1,0 +1,7 @@
+project_id = "hvvehkpnrmwibrcvtfjm"
+
+[functions.admin-reset-password]
+verify_jwt = false
+
+[functions.suggest-games]
+verify_jwt = false
