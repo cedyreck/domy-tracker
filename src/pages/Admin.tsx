@@ -4,6 +4,7 @@ import { InviteTokenCard } from "@/components/admin/InviteTokenCard";
 import { TerminateSessionButton } from "@/components/admin/TerminateSessionButton";
 import { AdminResetPasswordDialog } from "@/components/admin/AdminResetPasswordDialog";
 import { UserRoleManagement } from "@/components/admin/UserRoleManagement";
+import { UndoTerminationButton } from "@/components/admin/UndoTerminationButton";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Loader2, Shield, Key, Gamepad2, Users, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -67,7 +68,10 @@ const Admin = () => {
                 Archived scores will be viewable in the Reports page.
               </p>
             </div>
-            <TerminateSessionButton />
+            <div className="flex flex-wrap items-center gap-2">
+              <UndoTerminationButton />
+              <TerminateSessionButton />
+            </div>
           </div>
         </GlassCardContent>
       </GlassCard>

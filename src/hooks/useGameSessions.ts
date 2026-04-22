@@ -113,6 +113,26 @@ export const useGameSessions = () => {
     },
   });
 
+  // Undo last terminated session (admin only, 72-hour window)
+  const undoLastTermination = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("undo_last_termination");
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["game-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["active-session"] });
+      queryClient.invalidateQueries({ queryKey: ["session-scores"] });
+      queryClient.invalidateQueries({ queryKey: ["domy-relationships"] });
+      queryClient.invalidateQueries({ queryKey: ["rankings"] });
+      queryClient.invalidateQueries({ queryKey: ["activity-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-updates-incoming"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-updates-outgoing"] });
+      queryClient.invalidateQueries({ queryKey: ["request-history"] });
+    },
+  });
+
   // Mark score as paid (admin only)
   const markAsPaid = useMutation({
     mutationFn: async (scoreId: string) => {
@@ -157,6 +177,7 @@ export const useGameSessions = () => {
     loadingSessions,
     useSessionScores,
     terminateSession,
+    undoLastTermination,
     markAsPaid,
     markAsUnpaid,
     canTerminate: isAdmin,

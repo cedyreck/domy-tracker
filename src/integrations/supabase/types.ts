@@ -323,6 +323,55 @@ export type Database = {
           },
         ]
       }
+      session_balance_snapshots: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          opponent_id: string
+          player_id: string
+          session_id: string
+        }
+        Insert: {
+          balance: number
+          created_at?: string
+          id?: string
+          opponent_id: string
+          player_id: string
+          session_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          opponent_id?: string
+          player_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_balance_snapshots_opponent_id_fkey"
+            columns: ["opponent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_balance_snapshots_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_balance_snapshots_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -370,6 +419,7 @@ export type Database = {
         Returns: undefined
       }
       terminate_game_session: { Args: never; Returns: string }
+      undo_last_termination: { Args: never; Returns: string }
       update_domy_balance: {
         Args: {
           p_new_balance: number

@@ -42,6 +42,13 @@ describe("useGameSessions", () => {
     expect(result.error).toBeNull();
     expect(result.data).toBe("new-session-id");
   });
+
+  it("should have undo_last_termination RPC available", async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const result = await supabase.rpc("undo_last_termination");
+    expect(result.error).toBeNull();
+    expect(result.data).toBe("new-session-id");
+  });
 });
 
 describe("TerminateSessionButton visibility", () => {
